@@ -17,9 +17,7 @@ module.exports = {
     'usuarios.nome', 
     'usuarios.email', 
     'usuarios.cidade', 
-    'usuarios.idade']);
-
-    
+    'usuarios.idade']);  
 
     response.header('X-Total-Count', count['count(*)']);
     return response.json(churras);
@@ -28,16 +26,20 @@ module.exports = {
   async logado (request, response) {
     const { page = 1 } = request.query;
     const { usuario_id } = request.params;
+    var dateTime = require('node-datetime');
+    var dt = dateTime.create();
+    var formatted = dt.format('d/m/Y');
 
-    const [count] = await connection('churras').where('usuario_id', usuario_id)
+    const [count] = await connection('churras').where('usuario_id', usuario_id).where('data', '>=', '19/06/2020')
     .count();
 
     const churras = await connection('churras')
     .join('usuarios', 'usuarios.id', '=', 'churras.usuario_id')
     .limit(5)
-    .orderBy('data', 'desc')
+    .orderBy('data')
     .offset((page - 1) * 5)
     .where('usuario_id', usuario_id)
+    .where('data', '>=', formatted)
     .select(['churras.*', 
     'usuarios.nome', 
     'usuarios.email', 
@@ -50,42 +52,34 @@ module.exports = {
 
   async dataPassado(request, response) {
     const { page = 1 } = request.query;
-    const { data } = request.query;
-
-    const [count] = await connection('churras').where('data', data)
-    .count();
-
+    var dateTime = require('node-datetime');
+    var dt = dateTime.create();
+    var formatted = dt.format('d/m/Y');
 
     const churras = await connection('churras')
     .join('usuarios', 'usuarios.id', '=', 'churras.usuario_id')
-    .where('data', data)
-    .offset((page - 1) * 5)
+    .where('data', '<', formatted)
+    .offset((page - 1) * 10)
     .orderBy('data')
-    .limit(5)
+    .limit(10)
     .select(['churras.*', 
     'usuarios.nome', 
     'usuarios.email', 
     'usuarios.cidade', 
     'usuarios.idade']);
 
-    
-
-
-    response.header('Total-Passado', count['count(*)']);
     return response.json(churras);
   },
 
   async dataFuturo(request, response) {
     const { page = 1 } = request.query;
-    const { data } = request.query;
-
-    const [count] = await connection('churras').where('data', data)
-    .count();
-
+    var dateTime = require('node-datetime');
+    var dt = dateTime.create();
+    var formatted = dt.format('d/m/Y');
 
     const churras = await connection('churras')
     .join('usuarios', 'usuarios.id', '=', 'churras.usuario_id')
-    .where('data', data)
+    .where('data', '>=', formatted)
     .offset((page - 1) * 5)
     .orderBy('data')
     .limit(5)
@@ -93,31 +87,28 @@ module.exports = {
     'usuarios.nome', 
     'usuarios.email', 
     'usuarios.cidade', 
-    'usuarios.idade']);
+    'usuarios.idade']);    
 
-    
-
-
-    response.header('Total-Passado', count['count(*)']);
     return response.json(churras);
   },
 
   async create(request, response) {
-    const { nomeChurras, data, hrInicio, hrFim, local, descricao, convidados } = request.body;
+    const { nomeChurras, data, hrInicio, hrFim, local, descricao, foto,} = request.body;
     const usuario_id = request.headers.authorization;
-    const churrasCode = crypto.randomBytes(3).toString('HEX');
+    const id = crypto.randomBytes(8).toString('HEX');
 
-    const [id] = await connection('churras').insert({
+    await connection('churras').insert({
+      id,
       nomeChurras,
       data,
       hrInicio,
       hrFim,
       local,
       descricao,
-      convidados,
       usuario_id,
-      churrasCode
+      foto
     })
+    
     response.json({ id });
   },
 

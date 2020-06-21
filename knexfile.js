@@ -3,20 +3,14 @@
 module.exports = {
 
   development: {
-    client: 'pg',
+    client: 'sqlite3',
     connection: {
-      host: 'ec2-52-70-15-120.compute-1.amazonaws.com',
-      user: 'yntoptmemdbnhi',
-      password: 'c586cbe6a323542ef2a77ac4e4ae174683140a9f58fdf9cc947432eaf25a821c',
-      database: 'dfk1kccnkchri3',
-      ssl: {
-        require: true,
-        rejectUnauthorized: false
-      }
+      filename: './src/database/db.sqlite'
     },
     migrations: {
       directory: './src/database/migrations'
     },
+    useNullAsDefault: true,
   },
 
   staging: {
@@ -56,9 +50,9 @@ module.exports = {
   production: {
     client: 'postgresql',
     connection: {
-      database: 'my_db',
-      user: 'username',
-      password: 'password'
+      database: 'd990jcgvd0kl1d',
+      user:     'fptyftxizmaemc',
+      password: '8da6fc290a632882f3aa415da0cd212d608b2b72d34512cefda2e1e01f1baf03'
     },
     pool: {
       min: 2,
